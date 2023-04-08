@@ -20,7 +20,7 @@ from AuctionTenderApi.auction_tender_startup.views import HealthCheckView, SignU
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', HealthCheckView.as_view(), name='health-check'),
-    path('Login/', Login.as_view(), name='Login'),
-    path('SignUp/', SignUp.as_view(), name='SignUp'),
-    path('update/', updatedb.as_view(), name='Update'),
+    path('login', Login.as_view(), name='Login'),
+    path('signup', SignUp.as_view(), name='SignUp'),
+    path('update', updatedb.as_view(), name='Update'),
 ]
