@@ -48,7 +48,7 @@ class Tender(APIView):
             if int(tender_id) == doc['tender_id']:
                 collection.delete_one({'_id': doc['_id']})
                 return Response({"status": "tender delete successfully"})
-        return Response({"status": "key not found"})
+        return Response({"status": "key not found"}, status=409)
 
 
 class Auction(APIView):
@@ -87,7 +87,7 @@ class Auction(APIView):
             if int(auction_id) == doc['auction_id']:
                 collection.delete_one({'_id': doc['_id']})
                 return Response({"status": "auction delete successfully"})
-        return Response({"status": "key not found"})
+        return Response({"status": "key not found"}, status=409)
 
 
 class HealthCheckView(APIView):
@@ -106,7 +106,7 @@ class Login(APIView):
                 if record["email"] == json["email"] and record["password"] == json["password"]:
                     del record["_id"]
                     return Response(record)
-        return Response({"status": "User not found"})
+        return Response({"status": "User not found"}, status=409)
 
 
 class SignUp(APIView):
@@ -117,7 +117,7 @@ class SignUp(APIView):
         if documents is not None:
             for doc in documents:
                 if json["email"] == doc["email"]:
-                    return Response({"status": "User already exists"})
+                    return Response({"status": "User already exists"}, status=409)
         collection.insert_one(json)
         return Response({"status": "user created successfully"})
 
