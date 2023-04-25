@@ -6,9 +6,9 @@ from rest_framework.response import Response
 
 import pymongo
 
-# url = "mongodb+srv://bilalahmed:N1zfwQZZrw8LetbE@auctiontender.cc5nxin.mongodb.net/?retryWrites=true&w=majority"
-# client = pymongo.MongoClient(url)
-client = pymongo.MongoClient("mongodb+srv://hamza:asdfg@cluster0.7gpgsz7.mongodb.net/?retryWrites=true&w=majority")
+url = "mongodb+srv://bilalahmed:N1zfwQZZrw8LetbE@auctiontender.cc5nxin.mongodb.net/?retryWrites=true&w=majority"
+client = pymongo.MongoClient(url)
+# client = pymongo.MongoClient("mongodb+srv://hamza:asdfg@cluster0.7gpgsz7.mongodb.net/?retryWrites=true&w=majority")
 db = client.auction_tender
 
 
@@ -121,26 +121,19 @@ class SignUp(APIView):
         collection.insert_one(json)
         return Response({"status": "user created successfully"})
 
-
-class updatedb(APIView):
-    def get(self, request):
-        collection = db["data_collection"]
-        first_document = collection.find_one()
-        if first_document is None:
-            ob = {"data": {"auction": [], "tender": []}}
-            collection.insert_one(ob)
-            return Response(ob["data"])
-        else:
-            return Response(first_document["data"])
-
+class User(APIView):
     def post(self, request):
         json = request.data
-        collection = db["data_collection"]
-        first_document = collection.find_one()
-        if first_document is None:
-            ob = {"data": json}
-            collection.insert_one(ob)
-        else:
-            first_document['data'] = json
-            collection.replace_one({'_id': first_document['_id']}, first_document['data'])
-        return Response({"status": "db updated"})
+        collection = db[json['role'].upper()]
+        documents = list(collection.find())
+        for document in documents:
+            if document['email'] == json['email']:
+                if json.get('password', '') != '' and json.get('password', '') is not None:
+                    document['password'] = json['password']
+                if json.get('firstName', '') != '' and json.get('firstName', '') is not None:
+                    document['firstName'] = json['firstName']
+                if json.get('lastName', '') != '' and json.get('lastName', '') is not None:
+                    document['lastName'] = json['lastName']
+                collection.replace_one({'_id': document['_id']}, document)
+                return Response({"status": "user updated"})
+        return Response({"status": "user not found"})
