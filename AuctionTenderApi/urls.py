@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from AuctionTenderApi.auction_tender_startup.views import HealthCheckView, SignUp, Login, Tender, Auction, User
+from AuctionTenderApi.auction_tender_startup.views import HealthCheckView, SignUp, Login, Tender, Auction, TenderEmail, AuctionEmail, User
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +25,6 @@ urlpatterns = [
     path('tender', Tender.as_view(), name='Tender'),
     path('auction', Auction.as_view(), name='Auction'),
     path('user', User.as_view(), name='Update'),
+    path('tenderemail', TenderEmail.as_view(), name='TenderEmail'),
+    path('auctionemail', AuctionEmail.as_view(), name='AuctionEmail'),
 ]

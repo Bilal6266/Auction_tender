@@ -5,8 +5,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 import pymongo
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-url = "mongodb+srv://bilalahmed:N1zfwQZZrw8LetbE@auctiontender.cc5nxin.mongodb.net/?retryWrites=true&w=majority"
+
+url = "mongodb+srv://hamza:98483811@auctiontender.988pmxf.mongodb.net/?retryWrites=true&w=majority"
+# url = "mongodb+srv://bilalahmed:N1zfwQZZrw8LetbE@auctiontender.cc5nxin.mongodb.net/?retryWrites=true&w=majority"
 client = pymongo.MongoClient(url)
 # client = pymongo.MongoClient("mongodb+srv://hamza:asdfg@cluster0.7gpgsz7.mongodb.net/?retryWrites=true&w=majority")
 db = client.auction_tender
@@ -121,6 +126,7 @@ class SignUp(APIView):
         collection.insert_one(json)
         return Response({"status": "user created successfully"})
 
+
 class User(APIView):
     def post(self, request):
         json = request.data
@@ -137,3 +143,81 @@ class User(APIView):
                 collection.replace_one({'_id': document['_id']}, document)
                 return Response({"status": "user updated"})
         return Response({"status": "user not found"})
+
+
+class TenderEmail(APIView):
+
+    def post(self, request):
+        json = request.data
+        collection = db['COMPANY']
+        documents = list(collection.find())
+        for document in documents:
+            try:
+                # outlook_user = "waleedauction@outlook.com"
+                outlook_user = "waleed37405@outlook.com"
+                outlook_password = "WA98483811"
+
+                to = document['email']
+                subject = "New Tender"
+                tender_str = "New Tender added with following details:\n"
+                for key in json:
+                    tender_str += f"{key}: {json[key]}\n"
+                body = tender_str
+
+                msg = MIMEMultipart()
+                msg['From'] = outlook_user
+                msg['To'] = to
+                msg['Subject'] = subject
+
+                text = MIMEText(body, 'plain')
+                msg.attach(text)
+
+                server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+                server.starttls()
+                server.login(outlook_user, outlook_password)
+                text = msg.as_string()
+                server.sendmail(outlook_user, to, text)
+                server.quit()
+            except Exception as e:
+                print(e)
+        return Response({"status": "Email sent successful;y"})
+    
+class AuctionEmail(APIView):
+
+    def post(self, request):
+        json = request.data
+        collection = db['CUSTOMER']
+        documents1 = list(collection.find())
+        collection = db['COMPANY']
+        documents2 = list(collection.find())
+        documents = documents1 + documents2
+        for document in documents:
+            try:
+                # outlook_user = "waleedauction@outlook.com"
+                outlook_user = "waleed37405@outlook.com"
+                outlook_password = "WA98483811"
+
+                to = document['email']
+                subject = "New Auction"
+                tender_str = "New Auction added with following details:\n"
+                for key in json:
+                    tender_str += f"{key}: {json[key]}"
+                body = tender_str
+
+                msg = MIMEMultipart()
+                msg['From'] = outlook_user
+                msg['To'] = to
+                msg['Subject'] = subject
+
+                text = MIMEText(body, 'plain')
+                msg.attach(text)
+
+                server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+                server.starttls()
+                server.login(outlook_user, outlook_password)
+                text = msg.as_string()
+                server.sendmail(outlook_user, to, text)
+                server.quit()
+            except Exception as e:
+                pass
+        return Response({"status": "Email sent successful;y"})
