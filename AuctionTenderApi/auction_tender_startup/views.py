@@ -128,6 +128,21 @@ class SignUp(APIView):
 
 
 class User(APIView):
+    def get(self, request):
+        customer = db["CUSTOMER"]
+        company = db["COMPANY"]
+        customer_data = list(customer.find())
+        company_data = list(company.find())
+        out = []
+        for cust in customer_data:
+            del cust['_id']
+            out.append(cust)
+        
+        for comp in company_data:
+            del comp['_id']
+            out.append(comp)
+        return Response(out)
+
     def post(self, request):
         json = request.data
         collection = db[json['role'].upper()]
@@ -142,6 +157,29 @@ class User(APIView):
                     document['lastName'] = json['lastName']
                 collection.replace_one({'_id': document['_id']}, document)
                 return Response({"status": "user updated"})
+        return Response({"status": "user not found"})
+    
+    def put(self, request):
+        json = request.data
+        collection = db[json['role'].upper()]
+        document = collection.find_one({'email': json['email']})
+        if document:
+            if json.get('password'):
+                document['password'] = json['password']
+            if json.get('firstName'):
+                document['firstName'] = json['firstName']
+            if json.get('lastName'):
+                document['lastName'] = json['lastName']
+            collection.replace_one({'_id': document['_id']}, document)
+            return Response({"status": "user updated"})
+        return Response({"status": "user not found"})
+
+    def delete(self, request):
+        json = request.data
+        collection = db[json['role'].upper()]
+        result = collection.delete_one({'email': json['email']})
+        if result.deleted_count > 0:
+            return Response({"status": "user deleted"})
         return Response({"status": "user not found"})
 
 
