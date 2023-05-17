@@ -12,8 +12,8 @@ from email.mime.multipart import MIMEMultipart
 
 url = "mongodb+srv://hamza:98483811@auctiontender.988pmxf.mongodb.net/?retryWrites=true&w=majority"
 # url = "mongodb+srv://bilalahmed:N1zfwQZZrw8LetbE@auctiontender.cc5nxin.mongodb.net/?retryWrites=true&w=majority"
-client = pymongo.MongoClient(url)
 # client = pymongo.MongoClient("mongodb+srv://hamza:asdfg@cluster0.7gpgsz7.mongodb.net/?retryWrites=true&w=majority")
+client = pymongo.MongoClient(url)
 db = client.auction_tender
 
 
