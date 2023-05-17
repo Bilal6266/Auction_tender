@@ -176,11 +176,23 @@ class User(APIView):
 
     def delete(self, request):
         json = request.data
-        collection = db[json['role'].upper()]
-        result = collection.delete_one({'email': json['email']})
-        if result.deleted_count > 0:
-            return Response({"status": "user deleted"})
-        return Response({"status": "user not found"})
+        if json.get("email") is None:
+            return Response({"status": "Email not found in request"}, status=500)
+        try:
+            collection = db["CUSTOMER"]
+            result = collection.delete_one({'email': json['email']})
+            if result.deleted_count > 0:
+                return Response({"status": "user deleted"})
+        except:
+            pass
+        try:
+            collection = db["COMPANY"]
+            result = collection.delete_one({'email': json['email']})
+            if result.deleted_count > 0:
+                return Response({"status": "user deleted"})
+        except:
+            pass
+        return Response({"status": "user not found"}, status=500)
 
 
 class TenderEmail(APIView):
